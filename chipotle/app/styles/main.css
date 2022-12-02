@@ -1,0 +1,237 @@
+.browsehappy {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+body {
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Roboto', sans-serif;
+}
+
+md-content {
+  overflow: inherit;
+}
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header,
+.marketing,
+.footer {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+/* Custom page header */
+.header {
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 10px;
+}
+/* Make the masthead heading the same height as the navigation */
+.header h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+  padding-bottom: 19px;
+}
+
+/* Custom page footer */
+.footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+}
+
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jumbotron .btn {
+  font-size: 21px;
+  padding: 14px 24px;
+}
+
+/* Supporting marketing content */
+.marketing {
+  margin: 10px 0;
+}
+.marketing p + h4 {
+  margin-top: 28px;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  /* Space out the masthead */
+  .header {
+    margin-bottom: 30px;
+  }
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 0;
+  }
+}
+
+.sort-icon {
+  font-size: 9px;
+  margin-left: 5px;
+}
+
+th {
+  cursor:pointer;
+}
+
+
+.gridListdemoDynamicTiles md-icon {
+  width: 50%;
+  height: 30%; }
+
+.gridListdemoDynamicTiles md-icon svg {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  border-radius: 50%; }
+
+.gridListdemoDynamicTiles .s64 {
+  font-size: 64px; }
+
+.gridListdemoDynamicTiles .s32 {
+  font-size: 48px; }
+
+.gridListdemoDynamicTiles md-icon.fa {
+  display: block;
+  padding-left: 0;
+}
+
+.gridListdemoDynamicTiles md-icon.s32 span {
+  padding-left: 8px;
+}
+
+.gridListdemoDynamicTiles md-grid-list {
+  margin: 8px;
+}
+
+.gridListdemoDynamicTiles .gray {
+  background: #f5f5f5;
+  background: rgba(245, 245, 245, 0.68);
+}
+
+.gridListdemoDynamicTiles .green {
+  background: #b9f6ca;
+  background: rgba(185, 246, 202, 0.68);
+}
+
+.gridListdemoDynamicTiles .yellow {
+  background: #ffff8d;
+  background: rgba(255, 255, 141, 0.68);
+}
+
+.gridListdemoDynamicTiles .blue {
+  background: rgba(132, 255, 255, 0.68);
+}
+
+.gridListdemoDynamicTiles .darkBlue {
+  background: rgba(128, 216, 255, 0.68);
+}
+
+.gridListdemoDynamicTiles .deepBlue {
+  background: rgba(68, 138, 255, 0.68);
+}
+
+.gridListdemoDynamicTiles .purple {
+  background: #b388ff;
+  background: rgba(179, 136, 255, 0.68);
+}
+
+.gridListdemoDynamicTiles .lightPurple {
+  background: rgba(140, 158, 255, 0.68);
+}
+
+.gridListdemoDynamicTiles .red {
+  background: rgba(255, 138, 128, 0.68);
+}
+
+.gridListdemoDynamicTiles .pink {
+  background: rgba(255, 128, 171, 0.68);
+}
+
+.gridListdemoDynamicTiles md-grid-tile {
+  transition: all 300ms ease-out 50ms;
+}
+
+.gridListdemoDynamicTiles md-grid-tile md-icon {
+  padding-bottom: 32px;
+}
+
+.gridListdemoDynamicTiles md-grid-tile md-grid-tile-header {
+  background: rgba(0, 0, 0, 0.68);
+  height: 36px;
+}
+
+.gridListdemoDynamicTiles md-grid-tile-footer figcaption {
+  width: 100%; }
+
+.gridListdemoDynamicTiles md-grid-tile-footer figcaption h3 {
+  margin: 0;
+  font-weight: 700;
+  width: 100%;
+  text-align: center; }
+
+.custom-marker {
+  font-size: 12px;
+  padding: 4px;
+  background: #fff;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  border: #7F7F7F solid 1px;
+  text-align: center;
+}
+
+.custom-marker:after {
+  content: '';
+  position: absolute;
+  border-style: solid;
+  border-width: 7px 6px 0;
+  border-color: #fff transparent;
+  display: block;
+  width: 0;
+  z-index: 1;
+  margin-left: -6px;
+  bottom: -6px;
+  left: 50%;
+}
+
+.custom-marker:before {
+  content: '';
+  position: absolute;
+  border-style: solid;
+  border-width: 7px 6px 0;
+  border-color: #7F7F7F transparent;
+  display: block;
+  width: 0;
+  z-index: 0;
+  margin-left: -6px;
+  bottom: -7px;
+  left: 50%;
+}
+
+.mapTile {
+  width: 100%;
+  padding-top: 28px;
+}

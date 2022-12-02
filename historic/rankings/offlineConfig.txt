@@ -1,0 +1,5 @@
+{"config": {
+  "playersAPI": "players.txt",
+  "clubsAPI": "clubs.txt",
+  "matchesAPI": "matches.txt"
+}}

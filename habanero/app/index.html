@@ -1,0 +1,126 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title>NBA Rankings</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel='stylesheet' href='bower_components/bootstrap/dist/css/bootstrap.css' />
+    <link rel='stylesheet' href='bower_components/angular-material/angular-material.css' />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700,700italic' rel='stylesheet' type='text/css'>
+    <!-- colour the status bar on mobile chrome -->
+    <meta name="theme-color" content="#283593">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#283593">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  </head>
+  <body ng-app="NBAApp">
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <md-content style="overflow-x: inherit">
+      <md-toolbar layout-fill layout-wrap layout="row" class="md-hue-2" layout-align="space-between center">
+        <div layout="row">
+          <img src="images/badge_small.png" width="64" height="70"/>
+          <span style="margin-left: 1.5em;"><h3>NBA Rankings</h3></span>
+        </div>
+        <span flex="20"></span>
+        <div layout="row" layout-align="center end" class="md-hue-3" ng-controller="TabCtrl" flex-gt-sm="noshrink" flex-xs="100" flex-sm="100">
+          <md-tabs md-selected="selectedIndex" class="md-primary md-hue-2" layout-fill md-stretch-tabs="always">
+            <md-tab id="tab1" md-on-select="allPlayersClick()" aria-controls="All">
+              <md-tab-label>All</md-tab-label>
+            </md-tab>
+            <md-tab id="tab2" md-on-select="msClick()"  aria-controls="Mens Singles">
+              <md-tab-label>MS</md-tab-label>
+            </md-tab>
+            <md-tab id="tab3" md-on-select="lsClick()"  aria-controls="Ladies Singles">
+              <md-tab-label>LS</md-tab-label>
+            </md-tab>
+            <md-tab id="tab4" md-on-select="mdClick()" aria-controls="Mens Doubles">
+              <md-tab-label>MD</md-tab-label>
+            </md-tab>
+            <md-tab id="tab5" md-on-select="ldClick()" aria-controls="Ladies Doubles">
+              <md-tab-label>LD</md-tab-label>
+            </md-tab>
+            <md-tab id="tab6" md-on-select="mxdClick()" aria-controls="Mens Mixed Doubles">
+              <md-tab-label>MX</md-tab-label>
+            </md-tab>
+            <md-tab id="tab7" md-on-select="lxdClick()" aria-controls="Ladies Mixed Doubles">
+              <md-tab-label>LX</md-tab-label>
+            </md-tab>
+          </md-tabs>
+        </div>
+      </md-toolbar>
+      <div style="padding-left: 5px; padding-right: 5px">
+        <div ng-view=""></div>
+      </div>
+
+
+    </md-content>
+
+    <div class="footer">
+      <div class="container">
+        <!--<p><span class="glyphicon glyphicon-heart"></span> from the Northumberland Rankings Team</p>-->
+      </div>
+    </div>
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+     <script>
+       !function(A,n,g,u,l,a,r){A.GoogleAnalyticsObject=l,A[l]=A[l]||function(){
+       (A[l].q=A[l].q||[]).push(arguments)},A[l].l=+new Date,a=n.createElement(g),
+       r=n.getElementsByTagName(g)[0],a.src=u,r.parentNode.insertBefore(a,r)
+       }(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+       ga('create', 'UA-24891144-1');
+       ga('send', 'pageview');
+    </script>
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angularUtils-pagination/dirPagination.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/angular-aria/angular-aria.js"></script>
+    <script src="bower_components/angular-messages/angular-messages.js"></script>
+    <script src="bower_components/angular-material/angular-material.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <script src="scripts/app.js"></script>
+        <script src="scripts/controllers/main.js"></script>
+        <script src="scripts/controllers/player.js"></script>
+        <script src="scripts/controllers/rankings.js"></script>
+        <script src="scripts/controllers/tabCtrl.js"></script>
+        <script src="scripts/services/core/playerService.js"></script>
+        <script src="scripts/services/core/clubsService.js"></script>
+        <script src="scripts/services/core/matchesService.js"></script>
+        <script src="scripts/services/utilities/matchUtilityService.js"></script>
+        <script src="scripts/services/utilities/separateMatchesService.js"></script>
+        <script src="scripts/services/utilities/calculateRankingsService.js"></script>
+        <script src="scripts/services/utilities/gradeService.js"></script>
+        <script src="scripts/dataService.js"></script>
+        <script src="scripts/services/data/clubsDataService.js"></script>
+        <script src="scripts/services/data/playersDataService.js"></script>
+        <script src="scripts/services/data/matchesDataService.js"></script>
+        <!-- endbuild -->
+</body>
+</html>

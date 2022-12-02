@@ -1,0 +1,99 @@
+<md-content>
+  <div class="row marketing">
+    <h2 class="centered">{{title}}</h2>
+    <br />
+    <div class="alert alert-danger" ng-show="noConnection">
+      <strong>Error!</strong> Unable to connect to the rankings database. Please check your internet connection and try again later.
+    </div>
+    <md-progress-linear ng-show="loadingData" md-mode="indeterminate"></md-progress-linear>
+      <form class="form-inline" ng-show="!loadingData && players.length && !noConnection">
+        <div layout="row" layout-wrap layout-align="start center">
+          <md-input-container flex-xs="70" flex-sm="40" flex="35">
+              <!--<label>Search</label>-->
+              <input type="text" ng-model="search" placeholder="Search" layout-fill>
+          </md-input-container>
+          <md-input-container flex-xs="20" flex-sm="15" flex="10" style="margin-top: -4px;">
+            <label>Grade</label>
+            <md-select ng-model="selectedGrade" md-on-close="gradeFilterClose()">
+              <md-option ng-value="grade" ng-repeat="grade in grades">{{ grade }}</md-option>
+            </md-select>
+          </md-input-container>
+          <md-input-container flex-xs="70" flex-sm="40" flex="35" style="margin-top: -4px;">
+            <label >Club</label>
+            <md-select ng-model="selectedClub" md-on-close="clubFilterClose()">
+              <md-option ng-value="club" ng-repeat="club in clubs">{{ club.name }}</md-option>
+            </md-select>
+          </md-input-container>
+        </div>
+      </form>
+      <div ng-show="!loadingData && !players.length && !noConnection">
+        <h3 class="centered"><i>No players ranked yet</i></h3>
+      </div>
+      <div ng-show="!filteredPlayers.length && players.length">
+        <h3 class="centered"><i>No players match that search</i></h3>
+      </div>
+      <md-table-container ng-show="!loadingData && players.length && filteredPlayers && !noConnection">
+        <table class="table table-striped table-condensed table-hover">
+          <thead>
+          <tr>
+            <th ng-click="sort('rank')">
+              <span class="glyphicon sort-icon" ng-show="sortKey=='ranking'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+            </th>
+            <th ng-click="sort('name')">Name
+              <span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+            </th>
+            <th ng-click="sort('primaryClub')">Club
+              <span class="glyphicon sort-icon" ng-show="sortKey=='primaryClub'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+            </th>
+            <th hide-gt-xs ng-click="sort('grade')">Gr
+              <span class="glyphicon sort-icon" ng-show="sortKey=='grade'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+            </th>
+            <th hide-xs ng-click="sort('grade')">Grade
+              <span class="glyphicon sort-icon" ng-show="sortKey=='grade'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+            </th>
+            <th hide-gt-xs ng-click="sort('matchesPlayed')">P
+              <span class="glyphicon sort-icon" ng-show="sortKey=='matchesPlayed'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+            </th>
+            <th hide-xs ng-click="sort('matchesPlayed')">Played
+              <span class="glyphicon sort-icon" ng-show="sortKey=='matchesPlayed'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+            </th>
+            <th hide-gt-xs ng-click="sort('average')">Ave
+              <span class="glyphicon sort-icon" ng-show="sortKey=='average'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+            </th>
+            <th hide-xs ng-click="sort('average')">Average
+              <span class="glyphicon sort-icon" ng-show="sortKey=='average'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+            </th>
+          </tr>
+          </thead>
+          <tr dir-paginate="item in filteredPlayers = (players|orderBy:orderByFunction:reverse|filter:search|filter:filterFn|itemsPerPage:50)">
+            <td>
+              {{getRanking(item)}}
+            </td>
+            <td>
+              <a ng-href="#/player/{{item.id}}?view={{viewTab}}">{{item.name}}</a>
+            </td>
+            <td>
+              {{getClubDisplay(item)}}
+            </td>
+            <td>
+              {{getGrade(item)}}
+            </td>
+            <td>
+              {{getMatchesPlayed(item)}}
+            </td>
+            <td>
+              {{getAverage(item).toFixed(2)}}
+            </td>
+          </tr>
+        </table>
+        <div class="pagination pull-right">
+            <dir-pagination-controls
+            max-size="5"
+            direction-links="true"
+            boundary-links="true" >
+          </dir-pagination-controls>
+        </div>
+      </md-table-container>
+    </div>
+  </div>
+</md-content>

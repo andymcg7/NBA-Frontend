@@ -1,0 +1,17 @@
+<md-bottom-sheet ng-cloak>
+  <div layout="row" layout-align="center center">
+    <h3>NBA League Score Entry Errors</h3>
+  </div>
+  <div>
+    <br/><br/>
+    <h4>The following errors were found in your match submission:</h4>
+    <br/><br/>
+    <p></p>
+    <p ng-repeat="error in errorStrings">
+      {{error}}
+    </p>
+    <br/><br/><br/>
+    <p>Please correct these errors and try again. If you require help, please email the <a href="mailto:results@northumberlandbadminton.org">League Secretary</a>.</p>
+    <p>Please report any bugs or issues with the system to the <a href="mailto:webmaster@northumberlandbadminton.org">webmaster</a>.</p>
+  </div>
+</md-bottom-sheet>

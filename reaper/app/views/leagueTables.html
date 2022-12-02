@@ -1,0 +1,68 @@
+<md-content>
+  <div class="row marketing">
+    <h2 class="centered">{{title}}</h2>
+    <br />
+    <div class="alert alert-danger" ng-show="noConnection">
+      <strong>Error!</strong> Unable to connect to the rankings database. Please check your internet connection and try again later.
+    </div>
+    <md-progress-linear ng-show="loadingData" md-mode="indeterminate"></md-progress-linear>
+    <md-input-container ng-show="dataSuccess">
+      <md-select ng-model="selectedDivision" md-on-close="setupDivision()">
+        <md-option ng-value="division" ng-repeat="division in divisionList">{{ division.divisionName }} Division</md-option>
+      </md-select>
+    </md-input-container>
+
+
+    <md-table-container ng-show="dataSuccess">
+      <table class="table table-striped table-condensed table-hover">
+        <thead>
+        <tr>
+          <th>Team</th>
+          <th style="text-align: right;"><span hide-gt-xs>P</span><span hide-xs>Played</span></th>
+          <th style="text-align: right;"><span hide-gt-xs>W</span><span hide-xs>Won</span></th>
+          <th style="text-align: right;"><span hide-gt-xs>L</span><span hide-xs>Lost</span></th>
+          <th style="text-align: right;" hide-xs>Rubbers<br/>Diff</th>
+          <th style="text-align: right;" hide-xs>Sets<br/>Diff</th>
+          <th style="text-align: right;" hide-xs>Points<br/>Diff</th>
+          <th style="text-align: right;"><span hide-gt-xs>Points</span><span hide-xs>League<br/>Points</span></th>
+        </tr>
+        </thead>
+        <tr ng-repeat="team in selectedDivision.teams | orderBy:leagueOrderByFunction" ng-click="showMatches(team)">
+          <td>
+            {{team.teamName}}
+          </td>
+          <td style="text-align: right;">
+            {{team.played}}
+          </td>
+          <td style="text-align: right;">
+            {{team.won}}
+          </td>
+          <td style="text-align: right;">
+            {{team.lost}}
+          </td>
+          <td hide-xs style="text-align: right;">
+            {{team.rubbersFor - team.rubbersAgainst}}
+          </td>
+          <td hide-xs style="text-align: right;">
+            {{team.setsFor - team.setsAgainst}}
+          </td>
+          <td hide-xs style="text-align: right;">
+            {{team.pointsFor - team.pointsAgainst}}
+          </td>
+          <td style="text-align: right;">
+            {{team.leaguePoints}}
+          </td>
+        </tr>
+      </table>
+    </md-table-container>
+
+    <md-grid-list md-cols-xs="1" md-cols-sm="2" md-cols-md="3" md-cols-gt-md="4" md-row-height="50px"
+                  md-gutter="12px" md-gutter-gt-sm="8px" ng-show="dataSuccess">
+
+      <md-grid-tile ng-repeat="match in matchesForTeam" md-colspan="1" ng-click="viewMatch(match)">
+      <md-button layout-fill class="md-primary" style="text-transform: none;">{{getTeamName(match.homeTeam)}} {{match.homeTeamRubbers}} - {{match.awayTeamRubbers}} {{getTeamName(match.awayTeam)}}</md-button>
+      </md-grid-tile>
+
+    </md-grid-list>
+  </div>
+</md-content>

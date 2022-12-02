@@ -1,0 +1,7 @@
+{"config": {
+  "playersAPI": "../backend/playerJSONNew.php",
+  "clubsAPI": "../backend/clubJSONNew.php",
+  "teamsAPI": "../backend/clubJSONNew.php",
+  "matchesAPI": "../backend/matchJSONNew.php",
+  "leagueMatchesAPI": "../backend/leagueMatchJSONNew.php"
+}}

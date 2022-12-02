@@ -1,0 +1,336 @@
+<md-content>
+  <div>
+    <br />
+    <div class="alert alert-danger" ng-show="noConnection">
+      <strong>Error!</strong> Unable to connect to the rankings database. Please check your internet connection and try again later.
+    </div>
+    <md-progress-linear ng-show="loadingData" md-mode="indeterminate"></md-progress-linear>
+    <md-card ng-show="dataSuccess && cardComplete">
+        <md-card-title>
+          <md-card-title-text>
+            <span class="md-headline">{{homeTeamName}} v {{awayTeamName}}</span>
+            <span class="md-subhead">{{leagueMatch.division}} Division {{leagueMatch.matchType}} Match</span>
+            <span class="md-subhead">Played on {{formatMatchDate(leagueMatch.matchDate)}}<span> @ {{leagueMatch.venue}}</span></span>
+          </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+          <table hide-gt-xs class="table table-condensed table-hover" style="table-layout: fixed">
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sub><b><i>Away</i></b></sub></div>
+                <br/>
+                <div layout-fill style="text-align: left;"><sub><b><i>Home</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;">{{awayPair1Player1Text}}</div>
+                <div layout-fill style="text-align: right;">{{awayPair1Player2Text}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair1Player1Text}}</span>
+                <br/>
+                <span>{{homePair1Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>1</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match1)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match1)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match1)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair2Player1Text}}</span>
+                <br/>
+                <span>{{homePair2Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>4</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match4)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match4)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match4)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair3Player1Text}}</span>
+                <br/>
+                <span>{{homePair3Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>7</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match7)}}</div>
+                <div style="float: left;" ng-show="matchConceded(match7)"><sub><b><i>Conceded</i></b></sub></div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match7)}}</i></b></sub></div>
+              </td>
+            </tr>
+          </table>
+          <table hide-gt-xs class="table table-condensed table-hover" style="table-layout: fixed">
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sub><b><i>Away</i></b></sub></div>
+                <br/>
+                <div layout-fill style="text-align: left;"><sub><b><i>Home</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;">{{awayPair2Player1Text}}</div>
+                <div layout-fill style="text-align: right;">{{awayPair2Player2Text}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair1Player1Text}}</span>
+                <br/>
+                <span>{{homePair1Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>8</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match8)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match8)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match8)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair2Player1Text}}</span>
+                <br/>
+                <span>{{homePair2Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>2</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match2)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match2)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match2)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair3Player1Text}}</span>
+                <br/>
+                <span>{{homePair3Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>5</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match5)}}</div>
+                <div style="float: left;" ng-show="matchConceded(match5)"><sub><b><i>Conceded</i></b></sub></div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match5)}}</i></b></sub></div>
+              </td>
+            </tr>
+          </table>
+          <table hide-gt-xs class="table table-condensed table-hover" style="table-layout: fixed">
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sub><b><i>Away</i></b></sub></div>
+                <br/>
+                <div layout-fill style="text-align: left;"><sub><b><i>Home</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;">{{awayPair3Player1Text}}</div>
+                <div layout-fill style="text-align: right;">{{awayPair3Player2Text}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair1Player1Text}}</span>
+                <br/>
+                <span>{{homePair1Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+              <div layout-fill style="text-align: right;"><sup><b><i>6</i></b></sup></div>
+              <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match6)}}</div>
+              <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match6)}}</i></b></sub></div>
+              <div style="float: left;" ng-show="matchConceded(match6)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair2Player1Text}}</span>
+                <br/>
+                <span>{{homePair2Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+              <div layout-fill style="text-align: right;"><sup><b><i>9</i></b></sup></div>
+              <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match9)}}</div>
+              <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match9)}}</i></b></sub></div>
+              <div style="float: left;" ng-show="matchConceded(match9)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair3Player1Text}}</span>
+                <br/>
+                <span>{{homePair3Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+              <div layout-fill style="text-align: right;"><sup><b><i>3</i></b></sup></div>
+              <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match3)}}</div>
+              <div style="float: left;" ng-show="matchConceded(match3)"><sub><b><i>Conceded</i></b></sub></div>
+              <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match3)}}</i></b></sub></div>
+              </td>
+            </tr>
+          </table>
+          <table hide-xs class="table table-condensed table-hover">
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sub><b><i>Away</i></b></sub></div>
+                <br/>
+                <div layout-fill style="text-align: left;"><sub><b><i>Home</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;">{{awayPair1Player1Text}}</div>
+                <div layout-fill style="text-align: right;">{{awayPair1Player2Text}}</div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;">{{awayPair2Player1Text}}</div>
+                <div layout-fill style="text-align: right;">{{awayPair2Player2Text}}</div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;">{{awayPair3Player1Text}}</div>
+                <div layout-fill style="text-align: right;">{{awayPair3Player2Text}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair1Player1Text}}</span>
+                <br/>
+                <span>{{homePair1Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>1</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match1)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match1)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match1)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>8</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match8)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match8)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match8)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>6</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match6)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match6)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match6)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair2Player1Text}}</span>
+                <br/>
+                <span>{{homePair2Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>4</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match4)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match4)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match4)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>2</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match2)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match2)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match2)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>9</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match9)}}</div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match9)}}</i></b></sub></div>
+                <div style="float: left;" ng-show="matchConceded(match9)"><sub><b><i>Conceded</i></b></sub></div>
+              </td>
+            </tr>
+            <tr>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <span>{{homePair3Player1Text}}</span>
+                <br/>
+                <span>{{homePair3Player2Text}}</span>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>7</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match7)}}</div>
+                <div style="float: left;" ng-show="matchConceded(match7)"><sub><b><i>Conceded</i></b></sub></div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match7)}}</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>5</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match5)}}</div>
+                <div style="float: left;" ng-show="matchConceded(match5)"><sub><b><i>Conceded</i></b></sub></div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match5)}}</i></b></sub></div>
+              </td>
+              <td class="leagueMatchCell" style="padding-left: 10px; padding-right: 10px; line-height: 150%; border: 1px solid #ddd;">
+                <div layout-fill style="text-align: right;"><sup><b><i>3</i></b></sup></div>
+                <div layout-fill style="text-align: center;">{{getMatchScoreDisplay(match3)}}</div>
+                <div style="float: left;" ng-show="matchConceded(match3)"><sub><b><i>Conceded</i></b></sub></div>
+                <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match3)}}</i></b></sub></div>
+              </td>
+            </tr>
+          </table>
+          <div layout="row" layout-align="center center" flex="100">
+            <div layout="column" layout-align="center center" flex-gt-xs="50" flex-xs="100">
+              <span class="md-subhead" layout-fill style="text-align: center" flex="100"><b>Match Summary</b></span>
+              <table class="table table-condensed table-hover" style="table-layout: fixed">
+                <tr>
+                  <td>
+                    <div layout-fill style="text-align: right;"><b>{{homeTeamName}}</b></div>
+                  </td>
+                  <td>
+                    <div layout-fill></div>
+                  </td>
+                  <td>
+                    <div layout-fill><b>{{awayTeamName}}</b></div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div layout-fill style="text-align: right;">{{leagueMatch.homeTeamLeaguePoints}}</div>
+                  </td>
+                  <td>
+                    <div layout-fill style="text-align: center;">League Points</div>
+                  </td>
+                  <td>
+                    <div layout-fill>{{leagueMatch.awayTeamLeaguePoints}}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div layout-fill style="text-align: right;">{{leagueMatch.homeTeamRubbers}}</div>
+                  </td>
+                  <td>
+                    <div layout-fill style="text-align: center;">Rubbers</div>
+                  </td>
+                  <td>
+                    <div layout-fill>{{leagueMatch.awayTeamRubbers}}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div layout-fill style="text-align: right;">{{leagueMatch.homeTeamSets}}</div>
+                  </td>
+                  <td>
+                    <div layout-fill style="text-align: center;">Sets</div>
+                  </td>
+                  <td>
+                    <div layout-fill>{{leagueMatch.awayTeamSets}}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div layout-fill style="text-align: right;">{{leagueMatch.homeTeamPoints}}</div>
+                  </td>
+                  <td>
+                    <div layout-fill style="text-align: center;">Points</div>
+                  </td>
+                  <td>
+                    <div layout-fill>{{leagueMatch.awayTeamPoints}}</div>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </md-card-content>
+    </md-card>
+  </div>
+</md-content>
+
+

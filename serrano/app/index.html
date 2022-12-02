@@ -1,0 +1,103 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title>NBA League Match Approval</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel='stylesheet' href='bower_components/bootstrap/dist/css/bootstrap.css' />
+    <link rel='stylesheet' href='bower_components/angular-material/angular-material.css' />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700,700italic' rel='stylesheet' type='text/css'>
+    <!-- colour the status bar on mobile chrome -->
+    <meta name="theme-color" content="#283593">
+    <!-- Windows Phone -->
+    <meta name="msapplication-navbutton-color" content="#283593">
+    <!-- iOS Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  </head>
+  <body ng-app="NBAApp">
+    <!--[if lt IE 7]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <md-content style="overflow-x: inherit">
+      <md-toolbar layout-fill layout-wrap layout="row" class="md-hue-2" layout-align="space-between center">
+        <div layout="row">
+          <img src="images/badge_small.png" width="64" height="70"/>
+          <span style="margin-left: 1.5em;"><h3>NBA Leagues</h3></span>
+        </div>
+        <span flex="20"></span>
+      </md-toolbar>
+      <div style="padding-left: 5px; padding-right: 5px">
+        <div ng-view=""></div>
+      </div>
+    </md-content>
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
+    <script>
+      !function(A,n,g,u,l,a,r){A.GoogleAnalyticsObject=l,A[l]=A[l]||function(){
+          (A[l].q=A[l].q||[]).push(arguments)},A[l].l=+new Date,a=n.createElement(g),
+        r=n.getElementsByTagName(g)[0],a.src=u,r.parentNode.insertBefore(a,r)
+      }(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-24891144-1');
+      ga('send', 'pageview');
+    </script>
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <script src="bower_components/angularUtils-pagination/dirPagination.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/angular-aria/angular-aria.js"></script>
+    <script src="bower_components/angular-messages/angular-messages.js"></script>
+    <script src="bower_components/angular-material/angular-material.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/controllers/leagueMatch.js"></script>
+    <script src="scripts/services/core/playerService.js"></script>
+    <script src="scripts/services/core/clubsService.js"></script>
+    <script src="scripts/services/core/teamsService.js"></script>
+    <script src="scripts/services/core/leagueMatchesService.js"></script>
+    <script src="scripts/services/utilities/leagueTablesService.js"></script>
+    <script src="scripts/services/core/matchesService.js"></script>
+    <script src="scripts/services/utilities/matchUtilityService.js"></script>
+    <script src="scripts/services/utilities/createPlayerTransferObjectService.js"></script>
+    <script src="scripts/services/utilities/createLeagueMatchTransferObjectService.js"></script>
+    <script src="scripts/services/utilities/calculatePlayerAverageService.js"></script>
+    <script src="scripts/services/utilities/approveMatchService.js"></script>
+    <script src="scripts/services/utilities/gradeService.js"></script>
+    <script src="scripts/dataService.js"></script>
+    <script src="scripts/services/data/clubsDataService.js"></script>
+    <script src="scripts/services/data/playersDataService.js"></script>
+    <script src="scripts/services/data/matchesDataService.js"></script>
+    <script src="scripts/services/data/teamsDataService.js"></script>
+    <script src="scripts/services/data/leagueMatchesDataService.js"></script>
+    <script src="scripts/services/data/disputeMatchDataService.js"></script>
+    <script src="scripts/services/data/approveMatchDataService.js"></script>
+    <script src="scripts/services/data/authenticateLeagueMatchDataService.js"></script>
+    <script src="scripts/services/data/serverTimeService.js"></script>
+    <script src="scripts/services/data/updatePlayersDataService.js"></script>
+        <!-- endbuild -->
+</body>
+</html>

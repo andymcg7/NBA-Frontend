@@ -1,0 +1,365 @@
+<md-content style="overflow-x: inherit">
+<div class="row marketing">
+  <div class="alert alert-danger" ng-show="noConnection">
+    <strong>Error!</strong> Unable to connect to the rankings database. Please check your internet connection and try again later.
+  </div>
+  <md-progress-linear ng-show="loadingData" md-mode="indeterminate"></md-progress-linear>
+
+  <md-content>
+    <div id="playerMainDetails">
+      <div class="row">
+        <div class="col-sm-6">
+          <h3>{{player.name}}</h3>
+        </div>
+        <div class="col-sm-6">
+          <h3><i>{{getClubDisplay(player)}}</i></h3>
+        </div>
+      </div>
+    </div>
+
+    <md-tabs md-dynamic-height="" md-border-bottom="" md-swipe-content="true" md-selected="selectedTabIndex" ng-show="dataReady">
+      <md-tab label="Singles" md-on-select="onTabSelected()">
+        <md-content>
+          <br>
+          <h4>Grade: <b>{{player.singlesGrade}}</b></h4>
+          <br>
+          <div layout="row" layout-wrap ng-show="activeInSingles">
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+            Overall ranking: <b>{{player.singlesRanking}} / {{player.singlesRankingsTotal}}</b><br>
+            Ranking within grade: <b>{{player.singlesRankingWithinGrade}} / {{player.singlesRankingsTotalWithinGrade}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+            Average points: <b>{{player.singlesAverage}}</b><br>
+            Need for promotion: <b>{{getGradePromotionValue(player.singlesGrade)}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+            Demotion value: <b>{{player.singlesDemotionAverage}}</b><br>
+            To avoid demotion: <b>{{getGradeDemotionValue(player.singlesGrade)}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+            Matches played: <b>{{player.singlesMatchesPlayed}}</b><br>
+            Total points scored: <b>{{player.singlesTotalPoints}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+            Counting matches: <b>{{player.singlesCountingMatches}}</b><br>
+            Best points total: <b>{{player.singlesBestPoints}}</b>
+            </div>
+          </div>
+          <div ng-show="activeInSingles">
+            <br/>
+            <div ng-show="singles.promotion" style="color: green;">
+              <h4><i>You currently have enough points to be promoted.</i></h4>
+            </div>
+            <div ng-show="singles.demotion" style="color: red;">
+              <h4><i>You do not currently have enough points to remain at this grade.</i></h4>
+            </div>
+            <div ng-show="singles.remain">
+              <h4><i>You have enough points to remain at this grade.</i></h4>
+            </div>
+            <br/>
+          </div>
+          <table ng-show="activeInSingles" class="table table-striped table-condensed table-hover">
+            <thead>
+            <tr>
+              <th ng-click="singlesSort('match')">Match
+                <span class="glyphicon sort-icon" ng-show="singlesSortKey=='match'" ng-class="{'glyphicon-chevron-up':!singlesReverse,'glyphicon-chevron-down':singlesReverse}"></span>
+              </th>
+              <th hide-xs ng-click="singlesSort('date')">Date
+                <span class="glyphicon sort-icon" ng-show="singlesSortKey=='date'" ng-class="{'glyphicon-chevron-up':!singlesReverse,'glyphicon-chevron-down':singlesReverse}"></span>
+              </th>
+              <th hide-xs ng-click="singlesSort('result')">Res
+                <span class="glyphicon sort-icon" ng-show="singlesSortKey=='result'" ng-class="{'glyphicon-chevron-up':!singlesReverse,'glyphicon-chevron-down':singlesReverse}"></span>
+              </th>
+              <th ng-click="singlesSort('opponent')">Opponent
+                <span class="glyphicon sort-icon" ng-show="singlesSortKey=='opponent'" ng-class="{'glyphicon-chevron-up':!singlesReverse,'glyphicon-chevron-down':singlesReverse}"></span>
+              </th>
+              <th hide-xs hide-sm ng-click="singlesSort('opponentGrade')">Grade
+                <span class="glyphicon sort-icon" ng-show="singlesSortKey=='opponentGrade'" ng-class="{'glyphicon-chevron-up':!singlesReverse,'glyphicon-chevron-down':singlesReverse}"></span>
+              </th>
+              <th ng-click="singlesSort('score')">Score
+                <span class="glyphicon sort-icon" ng-show="singlesSortKey=='score'" ng-class="{'glyphicon-chevron-up':!singlesReverse,'glyphicon-chevron-down':singlesReverse}"></span>
+              </th>
+              <th hide-xs ng-click="singlesSort('points')">Points
+                <span class="glyphicon sort-icon" ng-show="singlesSortKey=='points'" ng-class="{'glyphicon-chevron-up':!singlesReverse,'glyphicon-chevron-down':singlesReverse}"></span>
+              </th>
+            </tr>
+            </thead>
+            <tr ng-repeat="match in singles.matches | orderBy:singlesOrderByFunction:singlesReverse">
+              <td>
+                {{match.title}}
+                <span hide-gt-xs>{{formatMatchDate(match.date)}}</span>
+              </td>
+              <td hide-xs>
+                {{formatMatchDate(match.date)}}
+              </td>
+              <td hide-xs>
+                {{getMatchResult(match, player.id)}}
+              </td>
+              <td>
+                <a ng-href="#/player/{{getOpponentID(match, player).opponent}}?view={{viewTab}}">{{getOpponentName(match, player)}}</a>
+              </td>
+              <td hide-xs hide-sm>
+                {{getOpponentGrade(match, player)}}
+              </td>
+              <td>
+                {{getMatchScore(match, player)}}
+              </td>
+              <td hide-xs>
+                {{getMatchPoints(match)}}
+              </td>
+            </tr>
+          </table>
+          <div ng-hide="activeInSingles">
+            <h4><b><i>Currently inactive in singles.</i></b><br></h4>
+          </div>
+          <br/>
+          <div ng-if="hasValidGradeHistory('Singles')">
+            <p><b>Grade History</b></p>
+            <ul>
+              <li ng-repeat="historyItem in singlesGradeHistoryDisplay">
+                {{historyItem}}
+              </li>
+            </ul>
+          </div>
+        </md-content>
+      </md-tab>
+      <md-tab label="Doubles" md-on-select="onTabSelected()">
+        <md-content>
+          <br>
+          <h4>Grade: <b>{{player.doublesGrade}}</b></h4>
+          <br>
+          <div layout="row" layout-wrap ng-show="activeInDoubles">
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Overall ranking: <b>{{player.doublesRanking}} / {{player.doublesRankingsTotal}}</b><br>
+              Ranking within grade: <b>{{player.doublesRankingWithinGrade}} / {{player.doublesRankingsTotalWithinGrade}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Average points: <b>{{player.doublesAverage}}</b><br>
+              Need for promotion: <b>{{getGradePromotionValue(player.doublesGrade)}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Demotion value: <b>{{player.doublesDemotionAverage}}</b><br>
+              To avoid demotion: <b>{{getGradeDemotionValue(player.doublesGrade)}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Matches played: <b>{{player.doublesMatchesPlayed}}</b><br>
+              Total points scored: <b>{{player.doublesTotalPoints}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Counting matches: <b>{{player.doublesCountingMatches}}</b><br>
+              Best points total: <b>{{player.doublesBestPoints}}</b>
+            </div>
+          </div>
+          <div ng-show="activeInDoubles">
+            <br/>
+            <div ng-show="doubles.promotion" style="color: green;">
+              <h4><i>You currently have enough points to be promoted.</i></h4>
+            </div>
+            <div ng-show="doubles.demotion" style="color: red;">
+              <h4><i>You do not currently have enough points to remain at this grade.</i></h4>
+            </div>
+            <div ng-show="doubles.remain">
+              <h4><i>You have enough points to remain at this grade.</i></h4>
+            </div>
+            <br/>
+          </div>
+          <table ng-show="activeInDoubles" class="table table-striped table-condensed table-hover">
+            <thead>
+            <tr>
+              <th ng-click="doublesSort('match')">Match
+                <span class="glyphicon sort-icon" ng-show="doublesSortKey=='match'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+              <th hide-xs ng-click="doublesSort('date')">Date
+                <span class="glyphicon sort-icon" ng-show="doublesSortKey=='date'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+              <th ng-click="doublesSort('partner')">Partner
+                <span class="glyphicon sort-icon" ng-show="doublesSortKey=='partner'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+              <th hide-xs hide-sm ng-click="doublesSort('partnerGrade')">Grade
+                <span class="glyphicon sort-icon" ng-show="doublesSortKey=='partnerGrade'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+              <th hide-xs ng-click="doublesSort('result')">Res
+                <span class="glyphicon sort-icon" ng-show="doublesSortKey=='result'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+              <th ng-click="doublesSort('opponent')">Opponent
+                <span class="glyphicon sort-icon" ng-show="doublesSortKey=='opponent'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+              <th hide-xs hide-sm ng-click="doublesSort('opponentGrade')">Grades
+                <span class="glyphicon sort-icon" ng-show="doublesSortKey=='opponentGrade'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+              <th ng-click="doublesSort('score')">Score
+                <span class="glyphicon sort-icon" ng-show="doublesSortKey=='score'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+              <th hide-xs ng-click="doublesSort('points')">Points
+                <span class="glyphicon sort-icon" ng-show="doublesSortKey=='points'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+            </tr>
+            </thead>
+            <tr ng-repeat="match in doubles.matches | orderBy:doublesOrderByFunction:doublesReverse">
+              <td>
+                {{match.title}}
+                <span hide-gt-xs>{{formatMatchDate(match.date)}}</span>
+              </td>
+              <td hide-xs>
+                {{formatMatchDate(match.date)}}
+              </td>
+              <td>
+                <a ng-href="#/player/{{getPartnerID(match, player)}}?view={{viewTab}}">{{getPartnerName(match, player)}}</a>
+              </td>
+              <td hide-xs hide-sm>
+                {{getPartnerGrade(match,player)}}
+              </td>
+              <td hide-xs>
+                {{getMatchResult(match, player.id)}}
+              </td>
+              <td>
+                <a ng-href="#/player/{{getOpponentID(match, player).opponent}}?view={{viewTab}}">{{getOpponentName(match, player).opponent1}}</a>/ <a ng-href="#/player/{{getOpponentID(match, player).partner}}?view={{viewTab}}">{{getOpponentName(match, player).opponent2}}</a>
+              </td>
+              <td hide-xs hide-sm>
+                {{getOpponentGrade(match, player)}}
+              </td>
+              <td>
+                {{getMatchScore(match, player)}}
+              </td>
+              <td hide-xs>
+                {{getMatchPoints(match)}}
+              </td>
+            </tr>
+          </table>
+          <div ng-hide="activeInDoubles">
+            <h4><b><i>Currently inactive in doubles.</i></b><br></h4>
+          </div>
+          <br/>
+          <div ng-if="hasValidGradeHistory('Doubles')">
+            <p><b>Grade History</b></p>
+            <ul>
+              <li ng-repeat="historyItem in doublesGradeHistoryDisplay">
+                {{historyItem}}
+              </li>
+            </ul>
+          </div>
+        </md-content>
+      </md-tab>
+      <md-tab label="Mixed" md-on-select="onTabSelected()">
+        <md-content>
+          <br>
+          <h4>Grade: <b>{{player.mixedGrade}}</b></h4>
+          <br>
+          <div layout="row" layout-wrap ng-show="activeInMixed">
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Overall ranking: <b>{{player.mixedRanking}} / {{player.mixedRankingsTotal}}</b><br>
+              Ranking within grade: <b>{{player.mixedRankingWithinGrade}} / {{player.mixedRankingsTotalWithinGrade}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Average points: <b>{{player.mixedAverage}}</b><br>
+              Need for promotion: <b>{{getGradePromotionValue(player.mixedGrade)}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Demotion value: <b>{{player.mixedDemotionAverage}}</b><br>
+              To avoid demotion: <b>{{getGradeDemotionValue(player.mixedGrade)}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Matches played: <b>{{player.mixedMatchesPlayed}}</b><br>
+              Total points scored: <b>{{player.mixedTotalPoints}}</b>
+            </div>
+            <div flex="100" flex-gt-sm="50" flex-sm="50" flex-md="30">
+              Counting matches: <b>{{player.mixedCountingMatches}}</b><br>
+              Best points total: <b>{{player.mixedBestPoints}}</b>
+            </div>
+          </div>
+          <div ng-show="activeInMixed">
+            <br/>
+            <div ng-show="mixed.promotion" style="color: green;">
+              <h4><i>You currently have enough points to be promoted.</i></h4>
+            </div>
+            <div ng-show="mixed.demotion" style="color: red;">
+              <h4><i>You do not currently have enough points to remain at this grade.</i></h4>
+            </div>
+            <div ng-show="mixed.remain">
+              <h4><i>You have enough points to remain at this grade.</i></h4>
+            </div>
+            <br/>
+          </div>
+          <table ng-show="activeInMixed" class="table table-striped table-condensed table-hover">
+            <thead>
+            <tr>
+              <th ng-click="mixedSort('match')">Match
+                <span class="glyphicon sort-icon" ng-show="mixedSortKey=='match'" ng-class="{'glyphicon-chevron-up':!mixedReverse,'glyphicon-chevron-down':mixedReverse}"></span>
+              </th>
+              <th hide-xs ng-click="mixedSort('date')">Date
+                <span class="glyphicon sort-icon" ng-show="mixedSortKey=='date'" ng-class="{'glyphicon-chevron-up':!mixedReverse,'glyphicon-chevron-down':mixedReverse}"></span>
+              </th>
+              <th ng-click="mixedSort('partner')">Partner
+                <span class="glyphicon sort-icon" ng-show="mixedSortKey=='partner'" ng-class="{'glyphicon-chevron-up':!mixedReverse,'glyphicon-chevron-down':mixedReverse}"></span>
+              </th>
+              <th hide-xs hide-sm ng-click="mixedSort('partnerGrade')">Grade
+                <span class="glyphicon sort-icon" ng-show="mixedSortKey=='partnerGrade'" ng-class="{'glyphicon-chevron-up':!mixedReverse,'glyphicon-chevron-down':mixedReverse}"></span>
+              </th>
+              <th hide-xs ng-click="mixedSort('result')">Res
+                <span class="glyphicon sort-icon" ng-show="mixedSortKey=='result'" ng-class="{'glyphicon-chevron-up':!mixedReverse,'glyphicon-chevron-down':mixedReverse}"></span>
+              </th>
+              <th ng-click="mixedSort('opponent')">Opponent
+                <span class="glyphicon sort-icon" ng-show="mixedSortKey=='opponent'" ng-class="{'glyphicon-chevron-up':!mixedReverse,'glyphicon-chevron-down':mixedReverse}"></span>
+              </th>
+              <th hide-xs hide-sm ng-click="mixedSort('opponentGrade')">Grades
+                <span class="glyphicon sort-icon" ng-show="mixedSortKey=='opponentGrade'" ng-class="{'glyphicon-chevron-up':!doublesReverse,'glyphicon-chevron-down':doublesReverse}"></span>
+              </th>
+              <th ng-click="mixedSort('score')">Score
+                <span class="glyphicon sort-icon" ng-show="mixedSortKey=='score'" ng-class="{'glyphicon-chevron-up':!mixedReverse,'glyphicon-chevron-down':mixedReverse}"></span>
+              </th>
+              <th hide-xs ng-click="mixedSort('points')">Points
+                <span class="glyphicon sort-icon" ng-show="mixedSortKey=='points'" ng-class="{'glyphicon-chevron-up':!mixedReverse,'glyphicon-chevron-down':mixedReverse}"></span>
+              </th>
+            </tr>
+            </thead>
+            <tr ng-repeat="match in mixed.matches | orderBy:mixedOrderByFunction:mixedReverse">
+              <td>
+                {{match.title}}
+                <span hide-gt-xs>{{formatMatchDate(match.date)}}</span>
+              </td>
+              <td hide-xs>
+                {{formatMatchDate(match.date)}}
+              </td>
+              <td>
+                <a ng-href="#/player/{{getPartnerID(match, player)}}?view={{viewTab}}">{{getPartnerName(match, player)}}</a>
+              </td>
+              <td hide-xs hide-sm>
+                {{getPartnerGrade(match,player)}}
+              </td>
+              <td hide-xs>
+                {{getMatchResult(match, player.id)}}
+              </td>
+              <td>
+                <a ng-href="#/player/{{getOpponentID(match, player).opponent}}?view={{viewTab}}">{{getOpponentName(match, player).opponent1}}</a>/ <a ng-href="#/player/{{getOpponentID(match, player).partner}}?view={{viewTab}}">{{getOpponentName(match, player).opponent2}}</a>
+              </td>
+              <td hide-xs hide-sm>
+                {{getOpponentGrade(match, player)}}
+              </td>
+              <td>
+                {{getMatchScore(match, player)}}
+              </td>
+              <td hide-xs>
+                {{getMatchPoints(match)}}
+              </td>
+            </tr>
+          </table>
+          <div ng-hide="activeInMixed">
+            <h4><b><i>Currently inactive in mixed.</i></b><br></h4>
+          </div>
+          <br/>
+          <div ng-if="hasValidGradeHistory('Mixed')">
+            <p><b>Grade History</b></p>
+            <ul>
+              <li ng-repeat="historyItem in mixedGradeHistoryDisplay">
+                {{historyItem}}
+              </li>
+            </ul>
+          </div>
+        </md-content>
+      </md-tab>
+    </md-tabs>
+  </md-content>
+
+  </div>
+</div>
+</md-content>

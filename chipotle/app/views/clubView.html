@@ -1,0 +1,131 @@
+<md-content style="overflow-x: inherit">
+  <md-toolbar layout-fill layout-wrap layout="row" class="md-hue-2" layout-align="space-between center">
+    <div layout="row">
+      <img src="images/badge_small.png" width="64" height="70"/>
+      <span style="margin-left: 1.5em;"><h2>{{clubName}} Club Summary</h2></span>
+    </div>
+    <span flex="20"></span>
+  </md-toolbar>
+  <div class="alert alert-danger" ng-show="noConnection">
+    <strong>Error!</strong> Unable to connect to the rankings database. Please check your internet connection and try again later.
+  </div>
+  <!--<div class="alert alert-danger" ng-show="noClubNumber">-->
+    <!--<strong>Error!</strong> Please supply a club number in the URL. For example http://www.northumberlandbadminton.org/leagues/club/#/5-->
+  <!--</div>-->
+  <div style="padding: 20px;">
+    <md-progress-linear ng-show="loadingData" md-mode="indeterminate"></md-progress-linear>
+  </div>
+  <div ng-show="noClubNumber && !noConnection">
+    <span>Please choose a club to view<br/><br/></span>
+    <md-input-container>
+      <label>Club</label>
+      <md-select ng-model="selectedClub" md-on-close="clubClose()">
+        <md-option ng-value="club" ng-repeat="club in clubs">{{ club.name }}</md-option>
+      </md-select>
+    </md-input-container>
+  </div>
+  <md-card ng-show="!loadingData && dataSuccess">
+    <md-card-content style="padding-left: 3px; padding-right: 3px; padding-top: 0px;">
+    <br />
+    <div >
+      <md-grid-list md-cols-xs="1" md-cols-sm="2" md-cols-md="3" md-cols-lg="4" md-cols-gt-lg="6" md-row-height="4rem" md-gutter="-1px" class="gridListdemoDynamicTiles" ng-show="tilesReady">
+        <md-grid-tile ng-repeat="tile in tiles track by $index" ng-init="init('rankings', clubToShow, tile.option, tile.data)" md-rowspan="{{tile.span.row}}" md-colspan="{{tile.span.col}}" md-colspan-sm="1" md-colspan-xs="1" ng-class="tile.background">
+          <md-grid-tile-header><h3>{{tile.title}}</h3></md-grid-tile-header>
+          <md-table-container style="margin-bottom: -25px;">
+            <table class="table-condensed" ng-show="tile.rankings" ng-cloak>
+              <thead>
+                <tr>
+                <th>
+                <span class="glyphicon sort-icon" ng-show="sortKey=='ranking'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+                </th>
+                <th>Name
+                <span class="glyphicon sort-icon" ng-show="sortKey=='name'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+                </th>
+                <th hide-gt-xs>Gr
+                <span class="glyphicon sort-icon" ng-show="sortKey=='grade'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+                </th>
+                <th hide-xs>Grade
+                <span class="glyphicon sort-icon" ng-show="sortKey=='grade'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+                </th>
+                <th hide-gt-xs>Ave
+                <span class="glyphicon sort-icon" ng-show="sortKey=='average'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+                </th>
+                <th hide-xs>Average
+                <span class="glyphicon sort-icon" ng-show="sortKey=='average'" ng-class="{'glyphicon-chevron-up':!reverse,'glyphicon-chevron-down':reverse}"></span>
+                </th>
+                </tr>
+              </thead>
+              <tr ng-repeat="item in tile.data">
+              <td>
+              {{getRanking(tile, item)}}
+              </td>
+              <td>
+                <a ng-href="http://northumberlandbadminton.org/leagues/rankings/#/player/{{item.id}}?view={{tile.viewTab}}" target="_blank">{{item.name}}</a>
+              </td>
+              <td>
+              {{getGrade(tile, item)}}
+              </td>
+              <td>
+              {{getAverage(tile, item).toFixed(2)}}
+              </td>
+              </tr>
+            </table>
+            <table class="table-condensed" ng-show="tile.leagueTable">
+              <thead>
+              <tr>
+                <th>Team</th>
+                <th style="text-align: right;"><span hide-gt-xs>P</span><span hide-xs>Played</span></th>
+                <th style="text-align: right;"><span hide-gt-xs>W</span><span hide-xs>Won</span></th>
+                <th style="text-align: right;"><span hide-gt-xs>L</span><span hide-xs>Lost</span></th>
+                <th style="text-align: right;" hide-xs>Points</th>
+              </tr>
+              </thead>
+              <tr ng-repeat="team in tile.division.teams">
+                <td>
+                  {{team.teamName}}
+                </td>
+                <td style="text-align: right;">
+                  {{team.played}}
+                </td>
+                <td style="text-align: right;">
+                  {{team.won}}
+                </td>
+                <td style="text-align: right;">
+                  {{team.lost}}
+                </td>
+                <td style="text-align: right;">
+                  {{team.leaguePoints}}
+                </td>
+              </tr>
+            </table>
+          </md-table-container>
+          <md-list ng-show="tile.recentMatches">
+            <md-list-item class="md-3-line" ng-repeat="match in tile.matches track by $index" ng-click="leagueMatchClick(match)">
+              <div class="md-list-item-text" layout="column">
+                <h3>{{getTeamName(match.homeTeam)}} {{match.homeTeamRubbers}} - {{match.awayTeamRubbers}} {{getTeamName(match.awayTeam)}}</h3>
+                <h4>{{ match.matchType }} {{ match.division }} Division</h4>
+                <h4>{{ formatMatchDate(match.matchDate) }}</h4>
+              </div>
+            </md-list-item>
+          </md-list>
+          <div ng-show="tile.map" class="mapTile">
+            <ng-map center="{{tile.lat}},{{tile.lng}}" zoom="13" >
+              <custom-marker position="[{{tile.lat}}, {{tile.lng}}]" title="{{clubName}}" animation="Animation.DROP">
+                <div class="customMarker">
+                  {{tile.venue}}<br/>
+                  {{tile.address}}
+                </div>
+              </custom-marker>
+            </ng-map>
+          </div>
+          <!--<ng-map zoom="13" center="{{tile.address}}" style="height:200px" ng-show="tile.map">-->
+            <!--&lt;!&ndash;<marker position="10 pennsylvania ave, washington DC" on-click="vm.showCustomMarker()"></marker>&ndash;&gt;-->
+            <!--&lt;!&ndash;<marker position="2600 pennsylvania ave, washington DC" on-click="vm.showCustomMarker()"></marker>&ndash;&gt;-->
+            <!--
+          <!--</ng-map>-->
+        </md-grid-tile>
+      </md-grid-list>
+    </div>
+    </md-card-content>
+  </md-card>
+</md-content>

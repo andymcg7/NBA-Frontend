@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+**/.tmp
+**/.sass-cache
+**/bower_components
+**/*.php
+**/error_log
+AC_OETags.html
+AC_OETags.js
+AdminApp.html
+AdminApp.swf
+backend.xml

@@ -1,0 +1,801 @@
+<md-content>
+  <div>
+    <br />
+    <div class="alert alert-danger" ng-show="noConnection">
+      <strong>Error!</strong> Unable to connect to the rankings database. Please check your internet connection and try again later.
+    </div>
+    <md-progress-linear ng-show="loadingData" md-mode="indeterminate" style="padding-top: 10px;"></md-progress-linear>
+    <form name="leagueMatchForm">
+    <md-card ng-show="dataSuccess && !submittingLeagueMatch" style="margin-left: 2px; margin-right: 2px;">
+      <md-card-title style="padding-left: 2px; padding-right: 2px;">
+        <md-card-title-text style="padding-top: 0px;">
+          <div class="md-subhead" layout="row" layout-wrap style="padding-top: 0px;" flex-order="-1">
+            <md-input-container class="inputContainer" flex="30" flex-xs="50">
+              <label>Match type</label>
+              <md-select class="comboBox" ng-model="leagueMatch.matchDiscipline" md-on-close="disciplineChosen()" md-selected-text="getDisciplineText()" style="color: rgba(0,0,0,1.00);">
+                <md-option ng-value="discipline" ng-repeat="discipline in disciplineList">{{ discipline }}</md-option>
+              </md-select>
+            </md-input-container>
+            <md-input-container class="inputContainer" flex="30" flex-xs="50" flex flex-order-xs="2">
+              <label>Division</label>
+              <md-select class="comboBox" ng-model="leagueMatch.division" md-on-close="divisionChosen()" ng-enabled="leagueMatch.matchDiscipline" md-selected-text="getSelectedDivisionText()">
+                <md-option ng-value="division" ng-repeat="division in divisionList">{{ division.divisionName }}</md-option>
+              </md-select>
+            </md-input-container>
+            <div layout-align="end start" layout-fill flex style="text-align: right;" flex-order-xs="1" flex-xs="50">
+              <md-button class="md-raised md-primary" ng-click="displayHelp();">Help</md-button>
+            </div>
+          </div>
+          <div class="md-subhead" layout="row" style="padding-top: 0px;">
+            <md-input-container class="inputContainer" flex="30" flex-xs="50">
+              <label>Home team</label>
+              <md-select class="comboBox" ng-model="leagueMatch.homeTeam" md-on-close="homeTeamChosen()" md-selected-text="getHomeTeamText()" ng-enabled="leagueMatch.division">
+                <md-option ng-value="team" ng-repeat="team in homeTeamList">{{ team.teamName }}</md-option>
+              </md-select>
+            </md-input-container>
+            <md-input-container class="inputContainer" flex="30" flex-xs="50">
+              <label>Away team</label>
+              <md-select class="comboBox" ng-model="leagueMatch.awayTeam" md-on-close="awayTeamChosen()" md-selected-text="getAwayTeamText()" ng-enabled="leagueMatch.division">
+                <md-option ng-value="team" ng-repeat="team in awayTeamList">{{ team.teamName }}</md-option>
+              </md-select>
+            </md-input-container>
+          </div>
+          <div class="md-subhead" layout="row" layout-wrap style="padding-top: 0px;">
+            <md-input-container class="inputContainer" flex="40" flex-sm="50" flex-xs="80">
+              <label style="color: rgba(0,0,0,0.87); font-size: 14px; font-weight: 400;">Venue</label>
+              <input ng-model="leagueMatch.venue" style="color: rgba(0,0,0,1.00);">
+            </md-input-container>
+            <div flex="20" flex-xs="80" flex-sm="50" layout="row">
+              <label style="color: rgba(0,0,0,0.87); font-size: 14px; font-weight: 400;">Date</label>
+              <md-datepicker name="matchDate" ng-model="leagueMatch.matchDate" required layout-fill></md-datepicker>
+            </div>
+          </div>
+          <div class="md-subhead" layout="row" style="padding-top: 0px;">
+            <md-input-container class="inputContainer" flex="30" flex-sm="50" flex-xs="80">
+              <label style="color: rgba(0,0,0,0.87); font-size: 14px; font-weight: 400;">Captain's Email Address</label>
+              <input ng-model="leagueMatch.email" name="captainEmail" type="email" required>
+            </md-input-container>
+          </div>
+        </md-card-title-text>
+      </md-card-title>
+      <md-card-content style="padding-left: 0px; padding-right: 0px;">
+        <table hide-gt-sm class="table table-condensed table-hover leagueMatchTable" style="table-layout: fixed">
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sub><b><i>{{leagueMatch.awayTeam.teamName}}</i></b></sub></div>
+              <br/>
+              <div layout-fill style="text-align: left;"><sub><b><i>{{leagueMatch.homeTeam.teamName}}</i></b></sub></div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+                <md-select class="comboBox" ng-model="leagueMatch.awayPair1Player1" md-on-close="playerChosen('awayPair1Player1')" md-selected-text="getPlayerText('awayPair1Player1')" ng-enabled="leagueMatch.awayTeam">
+                  <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers1">{{ player.name }}</md-option>
+                </md-select>
+                <md-select class="comboBox" ng-model="leagueMatch.awayPair1Player2" md-on-close="playerChosen('awayPair1Player2')" md-selected-text="getPlayerText('awayPair1Player2')" ng-enabled="leagueMatch.awayTeam">
+                  <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers2">{{ player.name }}</md-option>
+                </md-select>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+                <md-select class="comboBox" ng-model="leagueMatch.homePair1Player1" md-on-close="playerChosen('homePair1Player1')" md-selected-text="getPlayerText('homePair1Player1')" ng-enabled="leagueMatch.awayTeam">
+                  <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers1">{{ player.name }}</md-option>
+                </md-select>
+                <md-select class="comboBox" ng-model="leagueMatch.homePair1Player2" md-on-close="playerChosen('homePair1Player2')" md-selected-text="getPlayerText('homePair1Player2')" ng-enabled="leagueMatch.awayTeam">
+                  <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers2">{{ player.name }}</md-option>
+                </md-select>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sup><b><i>1</i></b></sup></div>
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M1T1S1" type="number" min="0" max="30" ng-change="scoreChange('M1T1S1')" class="centered" ng-model="leagueMatch.match1.team1Score1"  ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M1T2S1" type="number" min="0" max="30" ng-change="scoreChange('M1T2S1')" class="centered" ng-model="leagueMatch.match1.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M1T1S2" type="number" min="0" max="30" ng-change="scoreChange('M1T1S2')"  class="centered" ng-model="leagueMatch.match1.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M1T2S2" type="number" min="0" max="30" ng-change="scoreChange('M1T2S2')" class="centered" ng-model="leagueMatch.match1.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M1T1S3" type="number" min="0" max="30" ng-change="scoreChange('M1T1S3')" class="centered" ng-model="leagueMatch.match1.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M1T2S3" type="number" min="0" max="30" ng-change="scoreChange('M1T2S3')" class="centered" ng-model="leagueMatch.match1.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row" layout-wrap>
+                <md-checkbox ng-model="leagueMatch.match1.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 1 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match1')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.homePair2Player1" md-on-close="playerChosen('homePair2Player1')" md-selected-text="getPlayerText('homePair2Player1')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.homePair2Player2" md-on-close="playerChosen('homePair2Player2')" md-selected-text="getPlayerText('homePair2Player2')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sup><b><i>4</i></b></sup></div>
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M4T1S1" type="number" min="0" max="30" ng-change="scoreChange('M4T1S1')" class="centered" ng-model="leagueMatch.match4.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M4T2S1" type="number" min="0" max="30" ng-change="scoreChange('M4T2S1')" class="centered" ng-model="leagueMatch.match4.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M4T1S2" type="number" min="0" max="30" ng-change="scoreChange('M4T1S2')" class="centered" ng-model="leagueMatch.match4.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M4T2S2" type="number" min="0" max="30" ng-change="scoreChange('M4T2S2')" class="centered" ng-model="leagueMatch.match4.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M4T1S3" type="number" min="0" max="30" ng-change="scoreChange('M4T1S3')" class="centered" ng-model="leagueMatch.match4.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M4T2S3" type="number" min="0" max="30" ng-change="scoreChange('M4T2S3')" class="centered" ng-model="leagueMatch.match4.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row" layout-wrap>
+                <md-checkbox ng-model="leagueMatch.match4.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 4 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match4')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.homePair3Player1" md-on-close="playerChosen('homePair3Player1')" md-selected-text="getPlayerText('homePair3Player1')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.homePair3Player2" md-on-close="playerChosen('homePair3Player2')" md-selected-text="getPlayerText('homePair3Player2')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sup><b><i>7</i></b></sup></div>
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M7T1S1" type="number" min="0" max="30" ng-change="scoreChange('M7T1S1')" class="centered" ng-model="leagueMatch.match7.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M7T2S1" type="number" min="0" max="30" ng-change="scoreChange('M7T2S1')" class="centered" ng-model="leagueMatch.match7.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M7T1S2" type="number" min="0" max="30" ng-change="scoreChange('M7T1S2')" class="centered" ng-model="leagueMatch.match7.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M7T2S2" type="number" min="0" max="30" ng-change="scoreChange('M7T2S2')" class="centered" ng-model="leagueMatch.match7.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M7T1S3" type="number" min="0" max="30" ng-change="scoreChange('M7T1S3')" class="centered" ng-model="leagueMatch.match7.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M7T2S3" type="number" min="0" max="30" ng-change="scoreChange('M7T2S3')" class="centered" ng-model="leagueMatch.match7.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row" layout-wrap>
+                <md-checkbox ng-model="leagueMatch.match7.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 7 Conceded" flex="50" flex-xs="100">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" flex-xs="100"style="text-align: right"><sub><b><i>{{getWonByText('match7')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table hide-gt-sm class="table table-condensed table-hover leagueMatchTable" style="table-layout: fixed">
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sub><b><i>{{leagueMatch.awayTeam.teamName}}</i></b></sub></div>
+              <br/>
+              <div layout-fill style="text-align: left;"><sub><b><i>{{leagueMatch.homeTeam.teamName}}</i></b></sub></div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair2Player1" md-on-close="playerChosen('awayPair2Player1')" md-selected-text="getPlayerText('awayPair2Player1')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair2Player2" md-on-close="playerChosen('awayPair2Player2')" md-selected-text="getPlayerText('awayPair2Player2')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <span>{{getPlayerDisplay(leagueMatch.homePair1Player1.id)}}</span>
+              <br/>
+              <span>{{getPlayerDisplay(leagueMatch.homePair1Player2.id)}}</span>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sup><b><i>8</i></b></sup></div>
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M8T1S1" type="number" min="0" max="30" ng-change="scoreChange('M8T1S1')" class="centered" ng-model="leagueMatch.match8.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M8T2S1" type="number" min="0" max="30" ng-change="scoreChange('M8T2S1')" class="centered" ng-model="leagueMatch.match8.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M8T1S2" type="number" min="0" max="30" ng-change="scoreChange('M8T1S2')" class="centered" ng-model="leagueMatch.match8.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M8T2S2" type="number" min="0" max="30" ng-change="scoreChange('M8T2S2')" class="centered" ng-model="leagueMatch.match8.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M8T1S3" type="number" min="0" max="30" ng-change="scoreChange('M8T1S3')" class="centered" ng-model="leagueMatch.match8.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M8T2S3" type="number" min="0" max="30" ng-change="scoreChange('M8T2S3')" class="centered" ng-model="leagueMatch.match8.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row" layout-wrap>
+                <md-checkbox ng-model="leagueMatch.match8.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 8 Conceded" flex="50" flex-xs="100">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" flex-xs="100" style="text-align: right"><sub><b><i>{{getWonByText('match8')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <span>{{getPlayerDisplay(leagueMatch.homePair2Player1.id)}}</span>
+              <br/>
+              <span>{{getPlayerDisplay(leagueMatch.homePair2Player2.id)}}</span>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sup><b><i>2</i></b></sup></div>
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M2T1S1" type="number" min="0" max="30" ng-change="scoreChange('M2T1S1')" class="centered" ng-model="leagueMatch.match2.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M2T2S1" type="number" min="0" max="30" ng-change="scoreChange('M2T2S1')" class="centered" ng-model="leagueMatch.match2.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M2T1S2" type="number" min="0" max="30" ng-change="scoreChange('M2T1S2')" class="centered" ng-model="leagueMatch.match2.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M2T2S2" type="number" min="0" max="30" ng-change="scoreChange('M2T2S2')" class="centered" ng-model="leagueMatch.match2.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M2T1S3" type="number" min="0" max="30" ng-change="scoreChange('M2T1S3')" class="centered" ng-model="leagueMatch.match2.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M2T2S3" type="number" min="0" max="30" ng-change="scoreChange('M2T2S3')" class="centered" ng-model="leagueMatch.match2.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row" layout-wrap>
+                <md-checkbox ng-model="leagueMatch.match2.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 2 Conceded" flex="50" flex-xs="100">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" flex-xs="100" style="text-align: right"><sub><b><i>{{getWonByText('match2')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <span>{{getPlayerDisplay(leagueMatch.homePair3Player1.id)}}</span>
+              <br/>
+              <span>{{getPlayerDisplay(leagueMatch.homePair3Player2.id)}}</span>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sup><b><i>5</i></b></sup></div>
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M5T1S1" type="number" min="0" max="30" ng-change="scoreChange('M5T1S1')" class="centered" ng-model="leagueMatch.match5.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M5T2S1" type="number" min="0" max="30" ng-change="scoreChange('M5T2S1')" class="centered" ng-model="leagueMatch.match5.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M5T1S2" type="number" min="0" max="30" ng-change="scoreChange('M5T1S2')" class="centered" ng-model="leagueMatch.match5.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M5T2S2" type="number" min="0" max="30" ng-change="scoreChange('M5T2S2')" class="centered" ng-model="leagueMatch.match5.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M5T1S3" type="number" min="0" max="30" ng-change="scoreChange('M5T1S3')" class="centered" ng-model="leagueMatch.match5.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M5T2S3" type="number" min="0" max="30" ng-change="scoreChange('M5T2S3')" class="centered" ng-model="leagueMatch.match5.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row" layout-wrap>
+                <md-checkbox ng-model="leagueMatch.match5.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 5 Conceded" flex="50" flex-xs="100">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" flex-xs="100" style="text-align: right"><sub><b><i>{{getWonByText('match5')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table hide-gt-sm class="table table-condensed table-hover leagueMatchTable" style="table-layout: fixed">
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sub><b><i>{{leagueMatch.awayTeam.teamName}}</i></b></sub></div>
+              <br/>
+              <div layout-fill style="text-align: left;"><sub><b><i>{{leagueMatch.homeTeam.teamName}}</i></b></sub></div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair3Player1" md-on-close="playerChosen('awayPair3Player1')" md-selected-text="getPlayerText('awayPair3Player1')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair3Player2" md-on-close="playerChosen('awayPair3Player2')" md-selected-text="getPlayerText('awayPair3Player2')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <span>{{getPlayerDisplay(leagueMatch.homePair1Player1.id)}}</span>
+              <br/>
+              <span>{{getPlayerDisplay(leagueMatch.homePair1Player2.id)}}</span>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sup><b><i>6</i></b></sup></div>
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M6T1S1" type="number" min="0" max="30" ng-change="scoreChange('M6T1S1')" class="centered" ng-model="leagueMatch.match6.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M6T2S1" type="number" min="0" max="30" ng-change="scoreChange('M6T2S1')" class="centered" ng-model="leagueMatch.match6.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M6T1S2" type="number" min="0" max="30" ng-change="scoreChange('M6T1S2')" class="centered" ng-model="leagueMatch.match6.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M6T2S2" type="number" min="0" max="30" ng-change="scoreChange('M6T2S2')" class="centered" ng-model="leagueMatch.match6.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M6T1S3" type="number" min="0" max="30" ng-change="scoreChange('M6T1S3')" class="centered" ng-model="leagueMatch.match6.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M6T2S3" type="number" min="0" max="30" ng-change="scoreChange('M6T2S3')" class="centered" ng-model="leagueMatch.match6.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row" layout-wrap>
+                <md-checkbox ng-model="leagueMatch.match6.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 6 Conceded" flex="50" flex-xs="100">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" flex-xs="100" style="text-align: right"><sub><b><i>{{getWonByText('match6')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <span>{{getPlayerDisplay(leagueMatch.homePair2Player1.id)}}</span>
+              <br/>
+              <span>{{getPlayerDisplay(leagueMatch.homePair2Player2.id)}}</span>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sup><b><i>9</i></b></sup></div>
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M9T1S1" type="number" min="0" max="30" ng-change="scoreChange('M9T1S1')" class="centered" ng-model="leagueMatch.match9.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M9T2S1" type="number" min="0" max="30" ng-change="scoreChange('M9T2S1')" class="centered" ng-model="leagueMatch.match9.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M9T1S2" type="number" min="0" max="30" ng-change="scoreChange('M9T1S2')" class="centered" ng-model="leagueMatch.match9.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M9T2S2" type="number" min="0" max="30" ng-change="scoreChange('M9T2S2')" class="centered" ng-model="leagueMatch.match9.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M9T1S3" type="number" min="0" max="30" ng-change="scoreChange('M9T1S3')" class="centered" ng-model="leagueMatch.match9.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M9T2S3" type="number" min="0" max="30" ng-change="scoreChange('M9T2S3')" class="centered" ng-model="leagueMatch.match9.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row" layout-wrap>
+                <md-checkbox ng-model="leagueMatch.match9.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 9 Conceded" flex="50" flex-xs="100">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" flex-xs="100" style="text-align: right"><sub><b><i>{{getWonByText('match9')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <span>{{getPlayerDisplay(leagueMatch.homePair3Player1.id)}}</span>
+              <br/>
+              <span>{{getPlayerDisplay(leagueMatch.homePair3Player2.id)}}</span>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sup><b><i>3</i></b></sup></div>
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M3T1S1" type="number" min="0" max="30" ng-change="scoreChange('M3T1S1')" class="centered" ng-model="leagueMatch.match3.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M3T2S1" type="number" min="0" max="30" ng-change="scoreChange('M3T2S1')" class="centered" ng-model="leagueMatch.match3.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M3T1S2" type="number" min="0" max="30" ng-change="scoreChange('M3T1S2')" class="centered" ng-model="leagueMatch.match3.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M3T2S2" type="number" min="0" max="30" ng-change="scoreChange('M3T2S2')" class="centered" ng-model="leagueMatch.match3.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M3T1S3" type="number" min="0" max="30" ng-change="scoreChange('M3T1S3')" class="centered" ng-model="leagueMatch.match3.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M3T2S3" type="number" min="0" max="30" ng-change="scoreChange('M3T2S3')" class="centered" ng-model="leagueMatch.match3.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row" layout-wrap>
+                <md-checkbox ng-model="leagueMatch.match3.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 3 Conceded" flex="50" flex-xs="100">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" flex-xs="100" style="text-align: right"><sub><b><i>{{getWonByText('match3')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table hide-xs hide-sm class="table table-condensed table-hover leagueMatchTable">
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout-fill style="text-align: right;"><sub><b><i>{{leagueMatch.awayTeam.teamName}}</i></b></sub></div>
+              <br/>
+              <div layout-fill style="text-align: left;"><sub><b><i>{{leagueMatch.homeTeam.teamName}}</i></b></sub></div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair1Player1" md-on-close="playerChosen('awayPair1Player1')" md-selected-text="getPlayerText('awayPair1Player1')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair1Player2" md-on-close="playerChosen('awayPair1Player2')" md-selected-text="getPlayerText('awayPair1Player2')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair2Player1" md-on-close="playerChosen('awayPair2Player1')" md-selected-text="getPlayerText('awayPair2Player1')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair2Player2" md-on-close="playerChosen('awayPair2Player2')" md-selected-text="getPlayerText('awayPair2Player2')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair3Player1" md-on-close="playerChosen('awayPair3Player1')" md-selected-text="getPlayerText('awayPair3Player1')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.awayPair3Player2" md-on-close="playerChosen('awayPair3Player2')" md-selected-text="getPlayerText('awayPair3Player2')" ng-enabled="leagueMatch.awayTeam">
+                <md-option ng-value="player" ng-repeat="player in awayTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.homePair1Player1" md-on-close="playerChosen('homePair1Player1')" md-selected-text="getPlayerText('homePair1Player1')" ng-enabled="leagueMatch.homeTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.homePair1Player2" md-on-close="playerChosen('homePair1Player2')" md-selected-text="getPlayerText('homePair1Player2')" ng-enabled="leagueMatch.homeTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M1T1S1" type="number" min="0" max="30" ng-change="scoreChange('M1T1S1')" class="centered" ng-model="leagueMatch.match1.team1Score1"  ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M1T2S1" type="number" min="0" max="30" ng-change="scoreChange('M1T2S1')" class="centered" ng-model="leagueMatch.match1.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M1T1S2" type="number" min="0" max="30" ng-change="scoreChange('M1T1S2')"  class="centered" ng-model="leagueMatch.match1.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M1T2S2" type="number" min="0" max="30" ng-change="scoreChange('M1T2S2')" class="centered" ng-model="leagueMatch.match1.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M1T1S3" type="number" min="0" max="30" ng-change="scoreChange('M1T1S3')" class="centered" ng-model="leagueMatch.match1.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M1T2S3" type="number" min="0" max="30" ng-change="scoreChange('M1T2S3')" class="centered" ng-model="leagueMatch.match1.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row">
+                <md-checkbox ng-model="leagueMatch.match1.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 1 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match1')}}</i></b></sub></div>
+              </div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M8T1S1" type="number" min="0" max="30" ng-change="scoreChange('M8T1S1')" class="centered" ng-model="leagueMatch.match8.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M8T2S1" type="number" min="0" max="30" ng-change="scoreChange('M8T2S1')"  class="centered" ng-model="leagueMatch.match8.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M8T1S2" type="number" min="0" max="30" ng-change="scoreChange('M8T1S2')"  class="centered" ng-model="leagueMatch.match8.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M8T2S2" type="number" min="0" max="30" ng-change="scoreChange('M8T2S2')"  class="centered" ng-model="leagueMatch.match8.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M8T1S3" type="number" min="0" max="30" ng-change="scoreChange('M8T1S3')"  class="centered" ng-model="leagueMatch.match8.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M8T2S3" type="number" min="0" max="30" ng-change="scoreChange('M8T2S3')"  class="centered" ng-model="leagueMatch.match8.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row">
+                <md-checkbox ng-model="leagueMatch.match8.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 8 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match8')}}</i></b></sub></div>
+              </div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M6T1S1" type="number" min="0" max="30" ng-change="scoreChange('M6T1S1')"  class="centered" ng-model="leagueMatch.match6.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M6T2S1" type="number" min="0" max="30" ng-change="scoreChange('M6T2S1')"  class="centered" ng-model="leagueMatch.match6.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M6T1S2" type="number" min="0" max="30" ng-change="scoreChange('M6T1S2')"  class="centered" ng-model="leagueMatch.match6.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M6T2S2" type="number" min="0" max="30" ng-change="scoreChange('M6T6S2')"  class="centered" ng-model="leagueMatch.match6.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M6T1S3" type="number" min="0" max="30" ng-change="scoreChange('M6T1S3')"  class="centered" ng-model="leagueMatch.match6.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M6T2S3" type="number" min="0" max="30" ng-change="scoreChange('M6T2S3')"  class="centered" ng-model="leagueMatch.match6.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row">
+                <md-checkbox ng-model="leagueMatch.match6.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 6 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match6')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.homePair2Player1" md-on-close="playerChosen('homePair2Player1')" md-selected-text="getPlayerText('homePair2Player1')" ng-enabled="leagueMatch.homeTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.homePair2Player2" md-on-close="playerChosen('homePair2Player2')" md-selected-text="getPlayerText('homePair2Player2')" ng-enabled="leagueMatch.homeTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M4T1S1" type="number" min="0" max="30" ng-change="scoreChange('M4T1S1')" class="centered" ng-model="leagueMatch.match4.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M4T2S1" type="number" min="0" max="30" ng-change="scoreChange('M4T2S1')" class="centered" ng-model="leagueMatch.match4.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M4T1S2" type="number" min="0" max="30" ng-change="scoreChange('M4T1S2')" class="centered" ng-model="leagueMatch.match4.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M4T2S2" type="number" min="0" max="30" ng-change="scoreChange('M4T2S2')" class="centered" ng-model="leagueMatch.match4.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M4T1S3" type="number" min="0" max="30" ng-change="scoreChange('M4T1S3')" class="centered" ng-model="leagueMatch.match4.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M4T2S3" type="number" min="0" max="30" ng-change="scoreChange('M4T2S3')" class="centered" ng-model="leagueMatch.match4.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row">
+                <md-checkbox ng-model="leagueMatch.match4.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 4 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match4')}}</i></b></sub></div>
+              </div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M2T1S1" type="number" min="0" max="30" ng-change="scoreChange('M2T1S1')" class="centered" ng-model="leagueMatch.match2.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M2T2S1" type="number" min="0" max="30" ng-change="scoreChange('M2T2S1')" class="centered" ng-model="leagueMatch.match2.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M2T1S2" type="number" min="0" max="30" ng-change="scoreChange('M2T1S2')" class="centered" ng-model="leagueMatch.match2.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M2T2S2" type="number" min="0" max="30" ng-change="scoreChange('M2T2S2')" class="centered" ng-model="leagueMatch.match2.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M2T1S3" type="number" min="0" max="30" ng-change="scoreChange('M2T1S3')" class="centered" ng-model="leagueMatch.match2.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M2T2S3" type="number" min="0" max="30" ng-change="scoreChange('M2T2S3')" class="centered" ng-model="leagueMatch.match2.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row">
+                <md-checkbox ng-model="leagueMatch.match2.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 2 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match2')}}</i></b></sub></div>
+              </div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M9T1S1" type="number" min="0" max="30" ng-change="scoreChange('M9T1S1')" class="centered" ng-model="leagueMatch.match9.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M9T2S1" type="number" min="0" max="30" ng-change="scoreChange('M9T2S1')" class="centered" ng-model="leagueMatch.match9.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M9T1S2" type="number" min="0" max="30" ng-change="scoreChange('M9T1S2')" class="centered" ng-model="leagueMatch.match9.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M9T2S2" type="number" min="0" max="30" ng-change="scoreChange('M9T2S2')" class="centered" ng-model="leagueMatch.match9.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M9T1S3" type="number" min="0" max="30" ng-change="scoreChange('M9T1S3')" class="centered" ng-model="leagueMatch.match9.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M9T2S3" type="number" min="0" max="30" ng-change="scoreChange('M9T2S3')" class="centered" ng-model="leagueMatch.match9.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div layout-fill style="text-align: right;"><sub><b><i>{{getWonByText(match9)}}</i></b></sub></div>
+              <div style="padding-top: 10px;" layout="row">
+                <md-checkbox ng-model="leagueMatch.match9.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 9 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match9')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <md-select class="comboBox" ng-model="leagueMatch.homePair3Player1" md-on-close="playerChosen('homePair3Player1')" md-selected-text="getPlayerText('homePair3Player1')" ng-enabled="leagueMatch.homeTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers1">{{ player.name }}</md-option>
+              </md-select>
+              <md-select class="comboBox" ng-model="leagueMatch.homePair3Player2" md-on-close="playerChosen('homePair3Player2')" md-selected-text="getPlayerText('homePair3Player2')" ng-enabled="leagueMatch.homeTeam">
+                <md-option ng-value="player" ng-repeat="player in homeTeamAvailablePlayers2">{{ player.name }}</md-option>
+              </md-select>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M7T1S1" type="number" min="0" max="30" ng-change="scoreChange('M7T1S1')" class="centered" ng-model="leagueMatch.match7.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M7T2S1" type="number" min="0" max="30" ng-change="scoreChange('M7T2S1')" class="centered" ng-model="leagueMatch.match7.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M7T1S2" type="number" min="0" max="30" ng-change="scoreChange('M7T1S2')" class="centered" ng-model="leagueMatch.match7.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M7T2S2" type="number" min="0" max="30" ng-change="scoreChange('M7T2S2')" class="centered" ng-model="leagueMatch.match7.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M7T1S3" type="number" min="0" max="30" ng-change="scoreChange('M7T1S3')" class="centered" ng-model="leagueMatch.match7.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M7T2S3" type="number" min="0" max="30" ng-change="scoreChange('M7T2S3')" class="centered" ng-model="leagueMatch.match7.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row">
+                <md-checkbox ng-model="leagueMatch.match7.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 7 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match7')}}</i></b></sub></div>
+              </div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M5T1S1" type="number" min="0" max="30" ng-change="scoreChange('M5T1S1')" class="centered" ng-model="leagueMatch.match5.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M5T2S1" type="number" min="0" max="30" ng-change="scoreChange('M5T2S1')" class="centered" ng-model="leagueMatch.match5.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M5T1S2" type="number" min="0" max="30" ng-change="scoreChange('M5T1S2')" class="centered" ng-model="leagueMatch.match5.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M5T2S2" type="number" min="0" max="30" ng-change="scoreChange('M5T2S2')" class="centered" ng-model="leagueMatch.match5.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M5T1S3" type="number" min="0" max="30" ng-change="scoreChange('M5T1S3')" class="centered" ng-model="leagueMatch.match5.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M5T2S3" type="number" min="0" max="30" ng-change="scoreChange('M5T2S3')" class="centered" ng-model="leagueMatch.match5.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row">
+                <md-checkbox ng-model="leagueMatch.match5.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 5 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match5')}}</i></b></sub></div>
+              </div>
+            </td>
+            <td class="leagueMatchCell" style="line-height: 150%;">
+              <div layout="row" layout-wrap>
+                <div layout="row" class="leagueMatchScoreCell" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M3T1S1" type="number" min="0" max="30" ng-change="scoreChange('M3T1S1')" class="centered" ng-model="leagueMatch.match3.team1Score1" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M3T2S1" type="number" min="0" max="30" ng-change="scoreChange('M3T2S1')" class="centered" ng-model="leagueMatch.match3.team2Score1" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M3T1S2" type="number" min="0" max="30" ng-change="scoreChange('M3T1S2')" class="centered" ng-model="leagueMatch.match3.team1Score2" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M3T2S2" type="number" min="0" max="30" ng-change="scoreChange('M3T2S2')" class="centered" ng-model="leagueMatch.match3.team2Score2" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+                <div layout="row" style="width: 100%;" layout-align="center center" flex="100" flex-gt-lg="33">
+                  <input name="M3T1S3" type="number" min="0" max="30" ng-change="scoreChange('M3T1S3')" class="centered" ng-model="leagueMatch.match3.team1Score3" ng-pattern="/^\d+$/" flex="25"/>
+                  <label flex="10" class="centered">:</label>
+                  <input name="M3T2S3" type="number" min="0" max="30" ng-change="scoreChange('M3T2S3')" class="centered" ng-model="leagueMatch.match3.team2Score3" ng-pattern="/^\d+$/" flex="25"/>
+                </div>
+              </div>
+              <div style="padding-top: 10px;" layout="row">
+                <md-checkbox ng-model="leagueMatch.match3.matchPlayed" ng-true-value="false" ng-false-value="true" aria-label="Match 3 Conceded" flex="50">
+                  Conceded
+                </md-checkbox>
+                <div flex="50" style="text-align: right"><sub><b><i>{{getWonByText('match3')}}</i></b></sub></div>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <div layout="row" layout-align="center start" flex="100" layout-wrap>
+          <div layout="column" layout-align="center center" flex-gt-xs="50" flex-xs="100" flex-sm="100">
+            <span class="md-subhead" layout-fill style="text-align: center" flex="50" flex-xs="100"><b>Match Summary</b></span>
+            <table class="table table-condensed table-hover" style="table-layout: fixed">
+              <tr>
+                <td>
+                  <div layout-fill style="text-align: right;"><b>{{leagueMatch.homeTeam.teamName}}</b></div>
+                </td>
+                <td>
+                  <div layout-fill></div>
+                </td>
+                <td>
+                  <div layout-fill><b>{{leagueMatch.awayTeam.teamName}}</b></div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div layout-fill style="text-align: right;">{{leagueMatch.homeTeamLeaguePoints}}</div>
+                </td>
+                <td>
+                  <div layout-fill style="text-align: center;">League Points</div>
+                </td>
+                <td>
+                  <div layout-fill>{{leagueMatch.awayTeamLeaguePoints}}</div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div layout-fill style="text-align: right;">{{leagueMatch.homeTeamRubbers}}</div>
+                </td>
+                <td>
+                  <div layout-fill style="text-align: center;">Rubbers</div>
+                </td>
+                <td>
+                  <div layout-fill>{{leagueMatch.awayTeamRubbers}}</div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div layout-fill style="text-align: right;">{{leagueMatch.homeTeamSets}}</div>
+                </td>
+                <td>
+                  <div layout-fill style="text-align: center;">Sets</div>
+                </td>
+                <td>
+                  <div layout-fill>{{leagueMatch.awayTeamSets}}</div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div layout-fill style="text-align: right;">{{leagueMatch.homeTeamPoints}}</div>
+                </td>
+                <td>
+                  <div layout-fill style="text-align: center;">Points</div>
+                </td>
+                <td>
+                  <div layout-fill>{{leagueMatch.awayTeamPoints}}</div>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div layout-fill flex="50" flex-xs="100" flex-sm="100" style="padding: 10px;">
+            <div layout-fill class="md-subhead" style="text-align: center" ><b>Comments</b></div>
+            <textarea ng-model="leagueMatch.comments" flex="100" rows="6" cols="80">
+            </textarea>
+          </div>
+        </div>
+      </md-card-content>
+      <section layout="row" layout-align="center center" layout-wrap ng-show="dataSuccess && !submittingMatch">
+        <md-button class="md-raised md-primary" ng-click="submitMatch();"" ng-disabled="loadingData">Submit Match</md-button>
+        <md-button class="md-raised md-warn" ng-click="resetMatch();" ng-disabled="loadingData">Reset</md-button>
+      </section>
+    </md-card>
+    </form>
+    <div ng-show="submittingLeagueMatch && !submissionSuccessful && !submissionFailed" class="md-subhead">
+      <br/><br/>
+      <h3>Submitting League Match</h3>
+    </div>
+    <div ng-show="submissionSuccessful" class="md-subhead">
+      <br/><br/>
+      <h4>Your match has been successfully submitted. You should receive an email in the next few minutes confirming that the match has been properly received. An email will also be sent to a representative of the opposition so that they can confirm the match score. Once that confirmation is received the match will automatically be included in league match calculations.</h4>
+      <br/><br/><br/><br/>
+      <md-button class="md-raised md-primary" ng-click="submitAnotherMatch();">Submit Another Match</md-button>
+    </div>
+    <div ng-show="submissionFailed" class="md-subhead">
+      <br/><br/>
+      <h4>I'm sorry, there has been a problem accessing the rankings database. Please try again later. If the problem persists, please contact the database administrator.</h4>
+      <br/><br/><br/><br/>
+      <md-button class="md-raised md-primary" ng-click="resubmitMatch();">Try Again</md-button>
+    </div>
+  </div>
+</md-content>
+
+
