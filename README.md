@@ -7,5 +7,6 @@ Back in 2015/2016 when I wrote this, I thought it would be cool to give the diff
 ## Examples
 
 Rankings can be seen at: http://northumberlandbadminton.org/leagues/rankings/#/all/
+
 League tables can be seen at: http://northumberlandbadminton.org/leagues/tables/#/md?division=Premier
 
