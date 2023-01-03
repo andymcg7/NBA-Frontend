@@ -4,6 +4,7 @@
 **/.sass-cache
 **/bower_components
 **/*.php
+**/divisions.txt
 **/error_log
 AC_OETags.html
 AC_OETags.js
